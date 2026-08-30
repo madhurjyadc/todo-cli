@@ -129,8 +129,6 @@ func main() {
 			if index == -1 {
     			continue
 			}
-
-
 			tasks = slices.Delete(tasks, index, index+1)
 			fmt.Println("Task deleted successfully.")
 		}
