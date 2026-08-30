@@ -6,11 +6,52 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"slices"
 )
 
 type Task struct {
 	title string
 	status bool
+}
+
+func readTasks(s []Task) {
+	fmt.Println("\nThe following are your current tasks: ")
+	for i, task := range s {
+
+		if task.status {
+			fmt.Printf("%d. %s ✅\n", i+1, task.title)
+		} else {
+
+			fmt.Printf("%d. %s ❌\n", i+1, task.title)
+		}
+
+		
+	}
+
+	fmt.Println()
+}
+
+func modifyTasks(tasks []Task, s string) int {
+
+	fmt.Printf("\n%s", s)
+	reader := bufio.NewReader((os.Stdin))
+	taskUpdateValue, _ := reader.ReadString('\n')
+
+	taskUpdateValue = strings.TrimSpace(taskUpdateValue)
+
+	taskNumberInput, err := strconv.Atoi(taskUpdateValue)
+
+	if err != nil {
+		fmt.Println("Please enter a valid number.")
+		return -1
+	}
+
+	if taskNumberInput - 1 < 0 || taskNumberInput - 1 >= len(tasks) {
+		fmt.Println("Task does not exist.")
+		return -1
+	}
+
+	return taskNumberInput-1
 }
 
 func main() {
@@ -37,94 +78,62 @@ func main() {
 			fmt.Print("\nEnter the task: ")
 			reader := bufio.NewReader((os.Stdin))
 			task_input, _ := reader.ReadString('\n')
+			task_input = strings.TrimSpace(task_input)
 			tasks = append(tasks, Task{title: task_input, status: false})
 			fmt.Println("Task successfully appended!")
 
 
 		case "2\n":
-			fmt.Println("\nThe following are your current tasks: ")
-			for i, task := range tasks {
-
-				if task.status {
-					fmt.Printf("%d. %s ✅", i+1, task.title)
-				}
-
-				fmt.Printf("%d. %s ❌", i+1, task.title)
-			}
-
-			fmt.Print("\nSelect which task you want to modify: ")
-			reader := bufio.NewReader((os.Stdin))
-			taskUpdateValue, _ := reader.ReadString('\n')
-
-			taskUpdateValue = strings.TrimSpace(taskUpdateValue)
-
-			taskNumberInput, err := strconv.Atoi(taskUpdateValue)
-
-			if err != nil {
-				fmt.Println("Please enter a valid number.")
-				break
-			}
-
-			if taskNumberInput - 1 < 0 || taskNumberInput+1 >= len(tasks) {
-				fmt.Println("Task does not exist.")
-			}
-
-
+			readTasks(tasks)
+			index := modifyTasks(tasks, "Select which task you want to modify: ")
+			
 			fmt.Print("\nEnter the new title: ")
-
 			newTitle, _ := reader.ReadString('\n')
 			newTitle = strings.TrimSpace(newTitle)
 
-			tasks[taskNumberInput - 1].title = newTitle
+			if index == -1 {
+    			continue
+			}
+
+			tasks[index].title = newTitle
+
+			
 
 			fmt.Println("Task updated successfully!")
 
 
 		case "3\n":
 
-			fmt.Println("\nDisplaying all the tasks: \n")
-			for i, task := range tasks {
-
-				if task.status {
-					fmt.Printf("%d. %s ✅", i+1, task.title)
-				}
-
-				fmt.Printf("%d. %s ❌", i+1, task.title)
-			}
+			readTasks(tasks)
 		
 
 		case "4\n":
-			fmt.Println("\nThe following are your current tasks: ")
-			for i, task := range tasks {
+			readTasks(tasks)
 
-				if task.status {
-					fmt.Printf("%d. %s ✅", i+1, task.title)
-				}
-
-				fmt.Printf("%d. %s ❌", i+1, task.title)
-			}
-
-			fmt.Print("\nSelect which task's status you want to update: ")
-			reader := bufio.NewReader((os.Stdin))
-			taskUpdateValue, _ := reader.ReadString('\n')
-			taskUpdateValue = strings.TrimSpace(taskUpdateValue)
-			taskNumberInput, err := strconv.Atoi(taskUpdateValue)
-
-			if err != nil {
-				fmt.Println("Please enter a valid number.")
-				break
-			}
-
-			if taskNumberInput - 1 < 0 || taskNumberInput+1 >= len(tasks) {
-				fmt.Println("Task does not exist.")
-			}
-
+			index := modifyTasks(tasks, "Select which task you want to mark as done: ")
 			
+			if index == -1 {
+    			continue
+			}
 
 
+			tasks[index].status = true
+			fmt.Println("\nTask status updated successfully.")
+
+
+		case "5\n":
+			readTasks(tasks)
+
+			index := modifyTasks(tasks, "Select which task you want to delete: ")
+
+			if index == -1 {
+    			continue
+			}
+
+
+			tasks = slices.Delete(tasks, index, index+1)
+			fmt.Println("Task deleted successfully.")
 		}
-		
 	}
 
-	
 }
